@@ -6,6 +6,15 @@
 ```
 npm install
 ```
+#　此demo运行方法
+1. 安装node和npm
+2. npm install
+3. webpack
+4. 打开 page.html
+
+
+
+
 ## 通过这个任务学习到了:
 
 ### 出了问题要看命令行的提示,然后照着解决.
