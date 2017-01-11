@@ -1,11 +1,4 @@
-## 使用方法
 
-1. 下载全部文件到本地.
-
-2. 执行
-```
-npm install
-```
 #　此demo运行方法
 1. 安装node和npm
 2. npm install
