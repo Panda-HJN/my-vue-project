@@ -1,26 +1,31 @@
 {
-  "name": "my-webpack-demo",
+  "name": "task2-my-first-vue",
   "version": "1.0.0",
-  "description": "wepack-task1",
+  "description": "迈向VUE的第一步\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001bvue的第一步",
   "main": "app.js",
   "dependencies": {
     "babel-core": "^6.21.0",
     "babel-loader": "^6.2.10",
     "babel-preset-es2015": "^6.18.0",
-    "babel-preset-react": "^6.16.0"
+    "babel-preset-react": "^6.16.0",
+    "vue": "^2.1.8",
+    "webpack": "^1.14.0"
   },
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Panda-HJN/my-webpack-demo.git"
-  },
+  "keywords": [
+    "vue"
+  ],
   "author": "韩佳宁",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Panda-HJN/my-webpack-demo/issues"
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Panda-HJN/my-vue-project.git"
   },
-  "homepage": "https://github.com/Panda-HJN/my-webpack-demo#readme"
+  "bugs": {
+    "url": "https://github.com/Panda-HJN/my-vue-project/issues"
+  },
+  "homepage": "https://github.com/Panda-HJN/my-vue-project#readme"
 }
