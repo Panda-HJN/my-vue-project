@@ -18,6 +18,25 @@
         <h2>{{ message2 }}</h2>
         <h2>{{ message3 }}</h2>
     </div>
+
+
+
+    <div class="app3">
+        <h1>1{{ message1 }}</h1>
+        <h1>1{{ message1 }}</h1>
+        <h1>1{{ message1 }}</h1>
+    </div>
+    <h4>如果下面一行出现了2{{ message2 }}就证明vue实例中的<strong>el</strong>和dom元素是一一对应的</h4>
+    <div class="app3">
+        <h2>2{{ message2 }}</h2>
+    </div>
+
+
+   <div class="app4">1{{car}}</div>
+   <div class="ct">
+      <div class="app4">2{{car}}</div>
+      <h4>这里在el里按照 选择器的写法 进行描述是没问题的</h4>
+    </div>
     <script src="bundle.js"></script>
 </body>
 

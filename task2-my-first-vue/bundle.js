@@ -71,6 +71,19 @@
 	    message3: '就连便宜的G7也买不起了'
 	  }
 	});
+	var app3 = new _vue2.default({
+	  el: '.app3',
+	  data: {
+	    message1: '又要过年了',
+	    message2: '鸡年'
+	  }
+	});
+	var app3 = new _vue2.default({
+	  el: '.ct>.app4',
+	  data: {
+	    car: '开着特斯拉去送鸡翅'
+	  }
+	});
 
 /***/ },
 /* 1 */
