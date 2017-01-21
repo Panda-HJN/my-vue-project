@@ -53,38 +53,37 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var app = new _vue2.default({
-	  el: '#app',
-	  data: {
-	    newTodo: '',
-	    todoList: []
-	  },
-	  created: function created() {
-	    var _this = this;
-
-	    window.onbeforeunload = function () {
-	      var dataStr = JSON.stringify(_this.todoList);
-	      window.localStorage.setItem('myTodos', dataStr);
-	    };
-
-	    var oldDataStr = window.localStorage.getItem('myTodos');
-	    var oldData = JSON.parse(oldDataStr);
-	    this.todoList = oldData || [];
-	  },
-	  methods: {
-	    addTodo: function addTodo() {
-	      var time = new Date();
-	      this.todoList.push({
-	        title: this.newTodo,
-	        todoTime: time.getFullYear() + '-' + (time.getMonth() + 1) + '-' + time.getDate() + '     ' + time.getHours() + ':' + time.getMinutes(),
-	        done: false
-	      });
-	      this.newTodo = '';
+	    el: '#app',
+	    data: {
+	        newTodo: '',
+	        todoList: []
 	    },
-	    removeTodo: function removeTodo(todo) {
-	      var index = this.todoList.indexOf(todo);
-	      this.todoList.splice(index, 1);
+	    created: function created() {
+	        console.log("created");
+	        window.onbeforeunload = function () {
+	            var dataStr = JSON.stringify(this.todoList);
+	            window.localStorage.setItem("todos", dataStr);
+	        }();
+	        var oldDataStr = window.localStorage.getItem("todos"); //从localStorage取出数据
+	        console.log(oldDataStr);
+	        // let oldData = JSON.parse(oldDataStr)
+	        // this.todoList = oldData || [] //把旧数据存进 vue实例的todoList里
+	    },
+	    methods: {
+	        addTodo: function addTodo() {
+	            var time = new Date();
+	            this.todoList.push({
+	                title: this.newTodo, //输入的内容
+	                todoTime: time.getFullYear() + '年' + (time.getMonth() + 1) + '月' + time.getDate() + '日 ' + time.getHours() + ':' + time.getMinutes(), //建立时间
+	                done: false // 是否完成
+	            });
+	            this.newTodo = '';
+	        },
+	        removeTodo: function removeTodo(todo) {
+	            var index = this.todoList.indexOf(todo); //查看排第几
+	            this.todoList.splice(index, 1); // 在 index的位置删去一个元素
+	        }
 	    }
-	  }
 	});
 
 /***/ },
