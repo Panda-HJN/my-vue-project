@@ -1,6 +1,5 @@
 import Vue from 'vue'
 
-
 import AV from 'leancloud-storage'
 
 var APP_ID = 'S4Jth8Wn51NoWMoxVEyjpsg5-gzGzoHsz';
@@ -22,9 +21,11 @@ let app = new Vue({
             username: '',
             password: ''
         },
-        currentUser: null
+        currentUser: null,
+        showName: ''
     },
     created: function() {
+        console.log(this.$data.actionType); //可以通过 vm.$data 访问原始数据对象
         //ES6 语法 ()=> 更方便取到vue实例 的this
         window.onbeforeunload = () => {
             let dataStr = JSON.stringify(this.todoList)
@@ -35,6 +36,7 @@ let app = new Vue({
         let oldDataStr = window.localStorage.getItem("todos") //从localStorage取出数据
         let oldData = JSON.parse(oldDataStr)
         this.todoList = oldData || [] //把旧数据存进 vue实例的todoList里
+        this.currentUser = this.getCurrentUser() //看看当前已经登录的用户是谁
     },
     methods: {
         addTodo: function() {
@@ -51,23 +53,28 @@ let app = new Vue({
             this.todoList.splice(index, 1) // 在 index的位置删去一个元素
         },
         signUp: function() {
-            let user = new AV.User();
+            let user = new AV.User()
             user.setUsername(this.formData.username)
             user.setPassword(this.formData.password)
-            user.signUp().then(function(loginedUser) {
-                console.log(loginedUser)
-            }, function(error) {})
+            user.signUp().then(
+                (loginedUser) => {
+                    this.currentUser = this.getCurrentUser()
+                }, (error) => {
+                    alert("注册失败")
+                }
+            )
         },
         login: function() {
             AV.User.logIn(this.formData.username, this.formData.password).then((loginedUser) => {
                 this.currentUser = this.getCurrentUser()
-            }, function(error) {
-                alert('登录失败')
-            });
+            },(error) => {
+                alert("登录失败")
+            })
         },
-        getCurrentUser: function() {
+        getCurrentUser: function() { //这里有点疑问,需要重新看
             let current = AV.User.current()
             if (current) {
+                //ES6 解构赋值
                 let {
                     id,
                     createdAt,
@@ -75,13 +82,13 @@ let app = new Vue({
                         username
                     }
                 } = current
-//ES6 解构赋值
+                //ES6 对象初始化
                 return {
                     id,
                     username,
                     createdAt
                 }
-              } else {
+            } else {
                 return null
             }
         },
@@ -89,6 +96,16 @@ let app = new Vue({
             AV.User.logOut()
             this.currentUser = null
             window.location.reload()
+        },
+        saveUserData:function () {
+          let logedUser = AV.User.current()
+            if(logedUser.get("todoList")){
+                let oldTodoString = logedUser.get("todoList").todoString
+                let oldTodo = JSON.parse(oldTodoString)
+                return this.todoList = oldTodo || []
+            }else {
+                return this.todoList = []
+            }
         }
     }
 })

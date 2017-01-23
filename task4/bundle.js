@@ -73,11 +73,13 @@
 	            username: '',
 	            password: ''
 	        },
-	        currentUser: null
+	        currentUser: null,
+	        showName: ''
 	    },
 	    created: function created() {
 	        var _this = this;
 
+	        console.log(this.$data.actionType); //可以通过 vm.$data 访问原始数据对象
 	        //ES6 语法 ()=> 更方便取到vue实例 的this
 	        window.onbeforeunload = function () {
 	            var dataStr = JSON.stringify(_this.todoList);
@@ -87,6 +89,7 @@
 	        var oldDataStr = window.localStorage.getItem("todos"); //从localStorage取出数据
 	        var oldData = JSON.parse(oldDataStr);
 	        this.todoList = oldData || []; //把旧数据存进 vue实例的todoList里
+	        this.currentUser = this.getCurrentUser(); //看看当前已经登录的用户是谁
 	    },
 	    methods: {
 	        addTodo: function addTodo() {
@@ -103,29 +106,35 @@
 	            this.todoList.splice(index, 1); // 在 index的位置删去一个元素
 	        },
 	        signUp: function signUp() {
+	            var _this2 = this;
+
 	            var user = new _leancloudStorage2.default.User();
 	            user.setUsername(this.formData.username);
 	            user.setPassword(this.formData.password);
 	            user.signUp().then(function (loginedUser) {
-	                console.log(loginedUser);
-	            }, function (error) {});
-	        },
-	        login: function login() {
-	            var _this2 = this;
-
-	            _leancloudStorage2.default.User.logIn(this.formData.username, this.formData.password).then(function (loginedUser) {
 	                _this2.currentUser = _this2.getCurrentUser();
 	            }, function (error) {
-	                alert('登录失败');
+	                alert("注册失败");
+	            });
+	        },
+	        login: function login() {
+	            var _this3 = this;
+
+	            _leancloudStorage2.default.User.logIn(this.formData.username, this.formData.password).then(function (loginedUser) {
+	                _this3.currentUser = _this3.getCurrentUser();
+	            }, function (error) {
+	                alert("登录失败");
 	            });
 	        },
 	        getCurrentUser: function getCurrentUser() {
+	            //这里有点疑问,需要重新看
 	            var current = _leancloudStorage2.default.User.current();
 	            if (current) {
+	                //ES6 解构赋值
 	                var id = current.id,
 	                    createdAt = current.createdAt,
 	                    username = current.attributes.username;
-	                //ES6 解构赋值
+	                //ES6 对象初始化
 
 	                return {
 	                    id: id,
@@ -140,6 +149,16 @@
 	            _leancloudStorage2.default.User.logOut();
 	            this.currentUser = null;
 	            window.location.reload();
+	        },
+	        saveUserData: function saveUserData() {
+	            var logedUser = _leancloudStorage2.default.User.current();
+	            if (logedUser.get("todoList")) {
+	                var oldTodoString = logedUser.get("todoList").todoString;
+	                var oldTodo = JSON.parse(oldTodoString);
+	                return this.todoList = oldTodo || [];
+	            } else {
+	                return this.todoList = [];
+	            }
 	        }
 	    }
 	});

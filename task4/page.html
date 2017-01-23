@@ -46,7 +46,7 @@
              用户名<input type="text" v-model="formData.username">
            </div>
            <div class="formRow">
-             密码<input type="password" v-model="formData.password">
+             密码<input type="password" >
            </div>
            <div class="formActions">
              <input type="submit" value="注册">
@@ -54,12 +54,12 @@
          </form>
        </div>
        <div class="login" v-if="actionType=='login'">
-         <form @submit.prevent="login">
+         <form>
            <div class="formRow">
-             用户名<input type="text" v-model="formData.username">
+             用户名<input type="text">
            </div>
            <div class="formRow">
-             密码<input type="password" v-model="formData.password">
+             密码<input type="password">
            </div>
            <div class="formActions">
              <input type="submit" value="登入">
