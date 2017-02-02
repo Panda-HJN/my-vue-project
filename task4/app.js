@@ -22,11 +22,12 @@ let app = new Vue({
             password: ''
         },
         currentUser: null,
-        showName: ''
+        showName: '' //显示已登录的用户名
     },
+    // created vue实例建立成功之后执行的函数
     created: function() {
-        console.log(this.$data.actionType); //可以通过 vm.$data 访问原始数据对象
-        //ES6 语法 ()=> 更方便取到vue实例 的this
+        // console.log(this.$data.actionType); //可以通过 vm.$data 访问原始数据对象
+        //ES6 箭头函数 ()=> 更方便取到 this
         window.onbeforeunload = () => {
             let dataStr = JSON.stringify(this.todoList)
             window.localStorage.setItem("todos", dataStr)
@@ -67,7 +68,7 @@ let app = new Vue({
         login: function() {
             AV.User.logIn(this.formData.username, this.formData.password).then((loginedUser) => {
                 this.currentUser = this.getCurrentUser()
-            },(error) => {
+            }, (error) => {
                 alert("登录失败")
             })
         },
@@ -97,13 +98,13 @@ let app = new Vue({
             this.currentUser = null
             window.location.reload()
         },
-        saveUserData:function () {
-          let logedUser = AV.User.current()
-            if(logedUser.get("todoList")){
+        saveUserData: function() {
+            let logedUser = AV.User.current()
+            if (logedUser.get("todoList")) {
                 let oldTodoString = logedUser.get("todoList").todoString
                 let oldTodo = JSON.parse(oldTodoString)
                 return this.todoList = oldTodo || []
-            }else {
+            } else {
                 return this.todoList = []
             }
         }
