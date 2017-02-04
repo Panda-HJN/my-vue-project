@@ -8,27 +8,27 @@
             width: 1000px;
             margin: 0 auto;
         }
-        
+
         .newTask>input {
             display: block;
             margin: 0 auto;
         }
-        
+
         ol.todos>li {
             width: 900px;
             padding: 5px 0;
             margin: 10px 0;
             background: #00CCFF;
         }
-        
+
         ol.todos>li .right {
             float: right;
         }
-        
+
         .red {
             color: red;
         }
-        
+
         .blue {
             color: blue;
         }
@@ -39,7 +39,7 @@
 <body>
     <div id="app">
         <!--这个section是注册/登录模块,如果currentUser为 false 才显示这个模块-->
-        <section id="signInAndSignUp" v-if="!currentUser">
+        <!-- <section id="signInAndSignUp" v-if="!currentUser">
             <div>
                 <label><input type="radio" name="type" v-model="actionType" value="signUp">注册</label>
                 <label><input type="radio" name="type" v-model="actionType" value="login">登入</label>
@@ -70,27 +70,39 @@
                     </div>
                 </form>
             </div>
-        </section>
+        </section> -->
 
         <section id="todo" v-if="currentUser">
-            <p><button @click="logout">登出</button></p>
+            <p><button @click="logOut">登出</button></p>
+
             <div class="newTask">
-                <input type="text" v-model="newTodo" @keypress.enter="addTodo">
+              <input type="text" v-model="newTodo" @keypress.enter="addTodo" placeholder="请输入待办事项">
             </div>
             <ol class="todos">
-                <li v-for="todo in todoList">
-                    <input type="checkbox" v-model="todo.done"> {{ todo.title }}
-
-                    <span v-if="todo.done">已完成</span>
-                    <span v-else>未完成</span>
-
-                    <button @click="removeTodo(todo)">X</button>
-                </li>
+              <li v-for="todo in todoList">
+                <input type="checkbox" v-model="todo.done">
+                <span>{{ todo.title }}</span>
+                <div class="right">
+                  <span>创建时间: {{ todo.todoTime }}</span>
+                  <span v-if="todo.done" class="blue">已完成</span>
+                  <span v-else class="red">未完成</span>
+                  <button @click="removeTodo(todo)">x</button>
+                </div>
+              </li>
             </ol>
+
+
+
+
+
+
         </section>
     </div>
     <p>目前对于vue的理解是</p>
     <p>在html中通过指令来控制元素是否显示,通过绑定来显示数据</p>
+    <div class="dec">
+
+    </div>
     <script src="bundle.js"></script>
 </body>
 

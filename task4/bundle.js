@@ -63,37 +63,20 @@
 	    appKey: APP_KEY
 	});
 
+	var TestObject = _leancloudStorage2.default.Object.extend('TestObject');
+	var testObject = new TestObject();
+
 	var app = new _vue2.default({
 	    el: '#app',
 	    data: {
 	        newTodo: '',
 	        todoList: [],
 	        actionType: 'signUp',
-	        formData: {
-	            username: '',
-	            password: ''
-	        },
-	        currentUser: null,
-	        showName: '' //显示已登录的用户名
-	    },
-	    // created vue实例建立成功之后执行的函数
-	    created: function created() {
-	        var _this = this;
-
-	        // console.log(this.$data.actionType); //可以通过 vm.$data 访问原始数据对象
-	        //ES6 箭头函数 ()=> 更方便取到 this
-	        window.onbeforeunload = function () {
-	            var dataStr = JSON.stringify(_this.todoList);
-	            window.localStorage.setItem("todos", dataStr);
-	        };
-
-	        var oldDataStr = window.localStorage.getItem("todos"); //从localStorage取出数据
-	        var oldData = JSON.parse(oldDataStr);
-	        this.todoList = oldData || []; //把旧数据存进 vue实例的todoList里
-	        this.currentUser = this.getCurrentUser(); //看看当前已经登录的用户是谁
+	        currentUser: ''
 	    },
 	    methods: {
 	        addTodo: function addTodo() {
+	            console.log('addddd');
 	            var time = new Date();
 	            this.todoList.push({
 	                title: this.newTodo, //输入的内容
@@ -107,60 +90,27 @@
 	            this.todoList.splice(index, 1); // 在 index的位置删去一个元素
 	        },
 	        signUp: function signUp() {
-	            var _this2 = this;
-
 	            var user = new _leancloudStorage2.default.User();
 	            user.setUsername(this.formData.username);
 	            user.setPassword(this.formData.password);
 	            user.signUp().then(function (loginedUser) {
-	                _this2.currentUser = _this2.getCurrentUser();
-	            }, function (error) {
-	                alert("注册失败");
-	            });
+	                console.log(loginedUser);
+	            }, function (error) {});
 	        },
-	        login: function login() {
-	            var _this3 = this;
-
-	            _leancloudStorage2.default.User.logIn(this.formData.username, this.formData.password).then(function (loginedUser) {
-	                _this3.currentUser = _this3.getCurrentUser();
-	            }, function (error) {
-	                alert("登录失败");
-	            });
-	        },
-	        getCurrentUser: function getCurrentUser() {
-	            //这里有点疑问,需要重新看
-	            var current = _leancloudStorage2.default.User.current();
-	            if (current) {
-	                //ES6 解构赋值
-	                var id = current.id,
-	                    createdAt = current.createdAt,
-	                    username = current.attributes.username;
-	                //ES6 对象初始化
-
-	                return {
-	                    id: id,
-	                    username: username,
-	                    createdAt: createdAt
-	                };
-	            } else {
-	                return null;
-	            }
-	        },
-	        logout: function logout() {
-	            _leancloudStorage2.default.User.logOut();
-	            this.currentUser = null;
-	            window.location.reload();
-	        },
-	        saveUserData: function saveUserData() {
-	            var logedUser = _leancloudStorage2.default.User.current();
-	            if (logedUser.get("todoList")) {
-	                var oldTodoString = logedUser.get("todoList").todoString;
-	                var oldTodo = JSON.parse(oldTodoString);
-	                return this.todoList = oldTodo || [];
-	            } else {
-	                return this.todoList = [];
-	            }
+	        logOut: function logOut() {
+	            console.log(2);
 	        }
+	    },
+	    created: function created() {
+	        var _this = this;
+
+	        window.onbeforeunload = function () {
+	            var dataStr = JSON.stringify(_this.todoList); //取出todoList 并JSON字符串化
+	            window.localStorage.setItem("myTodos", dataStr); //存进localStorage
+	        };
+	        var oldDataString = window.localStorage.getItem('myTodos'); //从localStorage中取出
+	        var oldData = JSON.parse(oldDataString); //JSON化
+	        this.todoList = oldData || []; //覆盖 todoList
 	    }
 	});
 
