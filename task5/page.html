@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <style media="screen">
+        .ct {
+            width: 1000px;
+            margin: 0 auto;
+        }
+
+        .newTask>input {
+            display: block;
+            margin: 0 auto;
+        }
+
+        ol.todos>li {
+            width: 900px;
+            padding: 5px 0;
+            margin: 10px 0;
+            background: #00CCFF;
+        }
+
+        ol.todos>li .right {
+            float: right;
+        }
+
+        .red {
+            color: red;
+        }
+
+        .blue {
+            color: blue;
+        }
+    </style>
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+      <section id="signInAndSignUp" v-if="!currentUser">
+        <!-- 根据currentUser的状态 来决定是否展示 注册/登录 组件 -->
+          <div>
+            <label><input type="radio" name="type" value="signUp" v-model="actionType">注册</label>
+            <label><input type="radio" name="type" value="login" v-model="actionType">登入</label>
+          </div>
+          <div class="signUp" v-if="actionType === 'signUp'">
+            <!-- 通过判断 actionType 的值来决定显示 "注册" 还是显示 "登录" -->
+            <form @submit.prevent="signUp">
+              <!-- 注册表单 会执行signUp -->
+              <div class="formRow">
+                用户名<input type="text" v-model="formData.username">
+              </div>
+              <div class="formRow">
+                密码<input type="password" v-model="formData.password">
+              </div>
+              <div class="formActions">
+                <input type="submit" value="注册">
+              </div>
+            </form>
+          </div>
+          <div class="login" v-if="actionType === 'login'">
+            <form @submit.prevent="login">
+              <div class="formRow">
+                用户名<input type="text" v-model="formData.username">
+              </div>
+              <div class="formRow">
+                密码<input type="password" v-model="formData.password">
+              </div>
+              <div class="formActions">
+                <input type="submit" value="登入">
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section id="todo" v-if="currentUser">
+            <p><button @click="logOut">登出</button></p>
+
+            <div class="newTask">
+              <input type="text" v-model="newTodo" @keypress.enter="addTodo" placeholder="请输入待办事项">
+            </div>
+            <ol class="todos">
+              <li v-for="todo in todoList">
+                <input type="checkbox" v-model="todo.done">
+                <span>{{ todo.title }}</span>
+                <div class="right">
+                  <span>创建时间: {{ todo.todoTime }}</span>
+                  <span v-if="todo.done" class="blue">已完成</span>
+                  <span v-else class="red">未完成</span>
+                  <button @click="removeTodo(todo)">x</button>
+                </div>
+              </li>
+            </ol>
+
+
+
+
+
+
+        </section>
+    </div>
+    <p>目前的功能很简陋,存在local里的数据还没能和每一个用户名绑定</p>
+    <p>在task5中会继续完善</p>
+    <script src="bundle.js"></script>
+</body>
+
+</html>
