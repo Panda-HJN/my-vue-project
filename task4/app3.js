@@ -21,8 +21,8 @@ let app = new Vue({
             username: '',
             password: ''
         },
-        actionType: 'signUp', //表示当前登录状态
-        currentUser: null //表示当前是否已经登录
+        actionType: 'signUp', //这个值决定 是显示 注册  还是 显示 登录
+        currentUser: null //未登录时是空的,登陆后 getCurrentUser() 会给其赋值
     },
     methods: {
         addTodo: function() {
@@ -56,10 +56,30 @@ let app = new Vue({
                 alert('登录失败,用户名和密码可能错误')
             });
         },
-        logout: function() {
+        logOut: function() {
             AV.User.logOut()
-            this.currentUser = null//退出登录了就得把 currentUser 改一下
+            this.currentUser = null //退出登录了就得把 currentUser 改一下
             window.location.reload()
+        },
+        getCurrentUser: function() {
+            let current = AV.User.current()
+                //ES6 解构赋值
+            if (current) {
+                let {
+                    id,
+                    createdAt,
+                    attributes: {
+                        username
+                    }
+                } = current
+                return {
+                    id,
+                    username,
+                    createdAt
+                }
+            } else {
+                return null
+            }
         }
     },
     created: function() {
@@ -70,6 +90,6 @@ let app = new Vue({
         let oldDataString = window.localStorage.getItem('myTodos') //从localStorage中取出
         let oldData = JSON.parse(oldDataString) //JSON化
         this.todoList = oldData || [] //覆盖 todoList
-
+            this.currentUser = this.getCurrentUser()  
     }
 })
