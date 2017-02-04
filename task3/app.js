@@ -6,19 +6,20 @@ let app = new Vue({
         newTodo: '',
         todoList: []
     },
-    created: function() {
-        console.log("created");
-        window.onbeforeunload = (function() {
-            let dataStr = JSON.stringify(this.todoList)
-            window.localStorage.setItem("todos", dataStr)
-        })()
-        let oldDataStr = window.localStorage.getItem("todos") //从localStorage取出数据
-        console.log(oldDataStr);
-        // let oldData = JSON.parse(oldDataStr)
-        // this.todoList = oldData || [] //把旧数据存进 vue实例的todoList里
-    },
+    // created: function() {
+    //     console.log("created");
+    //     window.onbeforeunload = (function() {
+    //         let dataStr = JSON.stringify(this.todoList)
+    //         window.localStorage.setItem("todos", dataStr)
+    //     })()
+    //     let oldDataStr = window.localStorage.getItem("todos") //从localStorage取出数据
+    //
+    //     // let oldData = JSON.parse(oldDataStr)
+    //     // this.todoList = oldData || [] //把旧数据存进 vue实例的todoList里
+    // },
     methods: {
         addTodo: function() {
+          console.log('addddd');
             let time = new Date()
             this.todoList.push({
                 title: this.newTodo, //输入的内容
@@ -31,5 +32,15 @@ let app = new Vue({
             let index = this.todoList.indexOf(todo) //查看排第几
             this.todoList.splice(index, 1) // 在 index的位置删去一个元素
         }
+    },
+    created:function () {
+      window.onbeforeunload =()=>{
+        let dataStr = JSON.stringify(this.todoList)
+         window.localStorage.setItem("todos", dataStr)
+      }
+      let oldDataString = window.localStorage.getItem('myTodos')
+      let oldData = JSON.parse(oldDataString)
+      this.todoList = oldData || []
+
     }
 })

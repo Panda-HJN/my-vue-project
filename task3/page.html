@@ -39,7 +39,6 @@
         <div class="newTask">
           <input type="text" v-model="newTodo" @keypress.enter="addTodo" placeholder="请输入待办事项">
         </div>
-        <section id="todo"></section>
         <ol class="todos">
           <li v-for="todo in todoList">
             <input type="checkbox" v-model="todo.done">
