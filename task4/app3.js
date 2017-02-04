@@ -15,10 +15,14 @@ var testObject = new TestObject();
 let app = new Vue({
     el: '#app',
     data: {
-        newTodo: '',
-        todoList: [],
-        actionType: 'signUp',
-        currentUser:''
+        newTodo: '', //和输入框绑定
+        todoList: [], //存储todo项目
+        formData: { //用户数据
+            username: '',
+            password: ''
+        },
+        actionType: 'signUp', //表示当前登录状态
+        currentUser: null //表示当前是否已经登录
     },
     methods: {
         addTodo: function() {
@@ -39,12 +43,23 @@ let app = new Vue({
             let user = new AV.User();
             user.setUsername(this.formData.username);
             user.setPassword(this.formData.password);
-            user.signUp().then(function(loginedUser) {
-                console.log(loginedUser);
-            }, function(error) {});
+            user.signUp().then((loginedUser) => {
+                this.currentUser = this.getCurrentUser()
+            }, (error) => {
+                alert('注册失败.用户名可能非法,或者已被注册.')
+            });
         },
-        logOut:function () {
-          console.log(2);
+        login: function() {
+            AV.User.logIn(this.formData.username, this.formData.password).then((loginedUser) => {
+                this.currentUser = this.getCurrentUser()
+            }, function(error) {
+                alert('登录失败,用户名和密码可能错误')
+            });
+        },
+        logout: function() {
+            AV.User.logOut()
+            this.currentUser = null//退出登录了就得把 currentUser 改一下
+            window.location.reload()
         }
     },
     created: function() {

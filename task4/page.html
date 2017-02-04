@@ -38,39 +38,41 @@
 
 <body>
     <div id="app">
-        <!--这个section是注册/登录模块,如果currentUser为 false 才显示这个模块-->
-        <!-- <section id="signInAndSignUp" v-if="!currentUser">
-            <div>
-                <label><input type="radio" name="type" v-model="actionType" value="signUp">注册</label>
-                <label><input type="radio" name="type" v-model="actionType" value="login">登入</label>
-            </div>
-            <div class="signUp" v-if="actionType=='signUp'">
-                <form @submit.prevent=signUp>
-                    <div class="formRow">
-                        用户名<input type="text" v-model="formData.username">
-                    </div>
-                    <div class="formRow">
-                        密码<input type="password">
-                    </div>
-                    <div class="formActions">
-                        <input type="submit" value="注册">
-                    </div>
-                </form>
-            </div>
-            <div class="login" v-if="actionType=='login'">
-                <form>
-                    <div class="formRow">
-                        用户名<input type="text" v-model="formData.username">
-                    </div>
-                    <div class="formRow">
-                        密码<input type="password" v-model="formData.password">
-                    </div>
-                    <div class="formActions">
-                        <input type="submit" value="登入">
-                    </div>
-                </form>
-            </div>
-        </section> -->
+      <section id="signInAndSignUp" v-if="!currentUser">
+        <!-- 根据currentUser的状态 来决定是否展示 注册/登录 组件 -->
+          <div>
+            <label><input type="radio" name="type" value="signUp" v-model="actionType">注册</label>
+            <label><input type="radio" name="type" value="login" v-model="actionType">登入</label>
+          </div>
+          <div class="signUp" v-if="actionType === 'signUp'">
+            <!-- 通过判断 actionType 的值来决定显示 "注册" 还是显示 "登录" -->
+            <form @submit.prevent="signUp">
+              <!-- 注册表单 会执行signUp -->
+              <div class="formRow">
+                用户名<input type="text" v-model="formData.username">
+              </div>
+              <div class="formRow">
+                密码<input type="password" v-model="formData.password">
+              </div>
+              <div class="formActions">
+                <input type="submit" value="注册">
+              </div>
+            </form>
+          </div>
+          <div class="login" v-if="actionType === 'login'">
+            <form @submit.prevent="login">
+              <div class="formRow">
+                用户名<input type="text" v-model="formData.username">
+              </div>
+              <div class="formRow">
+                密码<input type="password" v-model="formData.password">
+              </div>
+              <div class="formActions">
+                <input type="submit" value="登入">
+              </div>
+            </form>
+          </div>
+        </section>
 
         <section id="todo" v-if="currentUser">
             <p><button @click="logOut">登出</button></p>

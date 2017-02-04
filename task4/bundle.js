@@ -69,10 +69,14 @@
 	var app = new _vue2.default({
 	    el: '#app',
 	    data: {
-	        newTodo: '',
-	        todoList: [],
-	        actionType: 'signUp',
-	        currentUser: ''
+	        newTodo: '', //和输入框绑定
+	        todoList: [], //存储todo项目
+	        formData: { //用户数据
+	            username: '',
+	            password: ''
+	        },
+	        actionType: 'signUp', //表示当前登录状态
+	        currentUser: null //表示当前是否已经登录
 	    },
 	    methods: {
 	        addTodo: function addTodo() {
@@ -90,22 +94,37 @@
 	            this.todoList.splice(index, 1); // 在 index的位置删去一个元素
 	        },
 	        signUp: function signUp() {
+	            var _this = this;
+
 	            var user = new _leancloudStorage2.default.User();
 	            user.setUsername(this.formData.username);
 	            user.setPassword(this.formData.password);
 	            user.signUp().then(function (loginedUser) {
-	                console.log(loginedUser);
-	            }, function (error) {});
+	                _this.currentUser = _this.getCurrentUser();
+	            }, function (error) {
+	                alert('注册失败.用户名可能非法,或者已被注册.');
+	            });
 	        },
-	        logOut: function logOut() {
-	            console.log(2);
+	        login: function login() {
+	            var _this2 = this;
+
+	            _leancloudStorage2.default.User.logIn(this.formData.username, this.formData.password).then(function (loginedUser) {
+	                _this2.currentUser = _this2.getCurrentUser();
+	            }, function (error) {
+	                alert('登录失败,用户名和密码可能错误');
+	            });
+	        },
+	        logout: function logout() {
+	            _leancloudStorage2.default.User.logOut();
+	            this.currentUser = null; //退出登录了就得把 currentUser 改一下
+	            window.location.reload();
 	        }
 	    },
 	    created: function created() {
-	        var _this = this;
+	        var _this3 = this;
 
 	        window.onbeforeunload = function () {
-	            var dataStr = JSON.stringify(_this.todoList); //取出todoList 并JSON字符串化
+	            var dataStr = JSON.stringify(_this3.todoList); //取出todoList 并JSON字符串化
 	            window.localStorage.setItem("myTodos", dataStr); //存进localStorage
 	        };
 	        var oldDataString = window.localStorage.getItem('myTodos'); //从localStorage中取出
