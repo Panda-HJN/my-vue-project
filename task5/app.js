@@ -1,43 +1,107 @@
 import Vue from 'vue'
 import AV from 'leancloud-storage'
 
-var APP_ID = 'S4Jth8Wn51NoWMoxVEyjpsg5-gzGzoHsz';
-var APP_KEY = 'sQhBBOPOSIq0JEya9YkiaYHF';
+let APP_ID = '8axnRtGoxCJhEzsvNPEAHnol-gzGzoHsz';
+let APP_KEY = '0YH4XkYflb4CUPfA743TGj8G';
 AV.init({
     appId: APP_ID,
     appKey: APP_KEY
 });
 
-var TestObject = AV.Object.extend('TestObject');
-var testObject = new TestObject();
-
-
-let app = new Vue({
+var app = new Vue({
     el: '#app',
     data: {
-        newTodo: '', //和输入框绑定
-        todoList: [], //存储todo项目
-        formData: { //用户数据
+        actionType: 'signUp',
+        formData: {
             username: '',
             password: ''
         },
-        actionType: 'signUp', //这个值决定 是显示 注册  还是 显示 登录
-        currentUser: null //未登录时是空的,登陆后 getCurrentUser() 会给其赋值
+        newTodo: '',
+        todoList: [],
+        currentUser: null,
     },
+    created: function() {
+
+        this.currentUser = this.getCurrentUser();
+        this.fetchTodos() // 将原来的一坨代码取一个名字叫做 fetchTodos
+
+    },
+    // watch: function() {
+    //     if (this.currentUser == null) {
+    //         this.actionType = 'signUp'
+    //     }
+    // },
     methods: {
+        fetchTodos: function() {
+            if (this.currentUser) {
+                var query = new AV.Query('AllTodos');
+                query.find()
+                    .then((todos) => {
+                        let avAllTodos = todos[0] // 因为理论上 AllTodos 只有一个，所以我们取结果的第一项
+                        let id = avAllTodos.id
+                        this.todoList = JSON.parse(avAllTodos.attributes.content) // 为什么有个 attributes？因为我从控制台看到的
+                        this.todoList.id = id // 为什么给 todoList 这个数组设置 id？因为数组也是对象啊
+                    }, function(error) {
+                        console.error(error)
+                    })
+            }
+        },
+        updateTodos: function() {
+            // 想要知道如何更新对象，先看文档 https://leancloud.cn/docs/leanstorage_guide-js.html#更新对象
+            let dataString = JSON.stringify(this.todoList) // JSON 在序列化这个有 id 的数组的时候，会得出怎样的结果？
+            let avTodos = AV.Object.createWithoutData('AllTodos', this.todoList.id)
+            avTodos.set('content', dataString)
+            avTodos.save().then(() => {
+                console.log('更新成功')
+            })
+        },
+        saveTodos: function() {
+            let dataString = JSON.stringify(this.todoList)
+            var AVTodos = AV.Object.extend('AllTodos');
+            var avTodos = new AVTodos();
+            var acl = new AV.ACL()
+            acl.setReadAccess(AV.User.current(), true) // 只有这个 user 能读
+            acl.setWriteAccess(AV.User.current(), true) // 只有这个 user 能写
+
+            avTodos.set('content', dataString);
+            avTodos.setACL(acl) // 设置访问控制
+            avTodos.save().then((todo) => {
+                this.todoList.id = todo.id // 一定要记得把 id 挂到 this.todoList 上，否则下次就不会调用 updateTodos 了
+                console.log('保存成功');
+            }, function(error) {
+                alert('保存失败');
+            });
+        },
+        saveOrUpdateTodos: function() {
+            if (this.todoList.id) {
+                this.updateTodos()
+            } else {
+                this.saveTodos()
+            }
+        },
         addTodo: function() {
-            console.log('addddd');
-            let time = new Date()
+            console.log('添加成功')
+            var time = new Date()
             this.todoList.push({
-                title: this.newTodo, //输入的内容
+                title: this.newTodo,
+                createdAt: new Date(),
                 todoTime: time.getFullYear() + '年' + (time.getMonth() + 1) + '月' + time.getDate() + '日 ' + time.getHours() + ':' + time.getMinutes(), //建立时间
-                done: false // 是否完成
+                done: false // 添加一个 done 属性
             })
             this.newTodo = ''
+            this.saveOrUpdateTodos() // 不能用 saveTodos 了
         },
         removeTodo: function(todo) {
-            let index = this.todoList.indexOf(todo) //查看排第几
-            this.todoList.splice(index, 1) // 在 index的位置删去一个元素
+            console.log(todo)
+            let index = this.todoList.indexOf(todo)
+            console.log(index)
+            this.todoList.splice(index, 1) // 不懂 splice？赶紧看 MDN 文档！
+            this.saveOrUpdateTodos() // 不能用 saveTodos 了
+        },
+        doneTodo: function(todo) {
+
+            //!!!!点击多选框这个行为本身就已经修改了一次 done的状态了!!!
+            this.saveOrUpdateTodos()
         },
         signUp: function() {
             let user = new AV.User();
@@ -46,50 +110,34 @@ let app = new Vue({
             user.signUp().then((loginedUser) => {
                 this.currentUser = this.getCurrentUser()
             }, (error) => {
-                alert('注册失败.用户名可能非法,或者已被注册.')
+                alert('注册失败')
+                console.log(error)
             });
         },
         login: function() {
             AV.User.logIn(this.formData.username, this.formData.password).then((loginedUser) => {
                 this.currentUser = this.getCurrentUser()
+                this.fetchTodos() // 登录成功后读取 todos
             }, function(error) {
-                alert('登录失败,用户名和密码可能错误')
+                alert('登录失败')
+                console.log(error)
             });
-        },
-        logOut: function() {
-            AV.User.logOut()
-            this.currentUser = null //退出登录了就得把 currentUser 改一下
-            window.location.reload()
         },
         getCurrentUser: function() {
             let current = AV.User.current()
-                //ES6 解构赋值
             if (current) {
-                let {
-                    id,
-                    createdAt,
-                    attributes: {
-                        username
-                    }
-                } = current
-                return {
-                    id,
-                    username,
-                    createdAt
-                }
+                let { id, createdAt, attributes: { username } } = current
+                // 上面这句话看不懂就得看 MDN 文档了
+                // 我的《ES 6 新特性列表》里面有链接：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
+                return { id, username, createdAt } // 看文档：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Object_initializer#ECMAScript_6%E6%96%B0%E6%A0%87%E8%AE%B0
             } else {
                 return null
             }
+        },
+        logout: function() {
+            AV.User.logOut()
+            this.currentUser = null
+            window.location.reload()
         }
-    },
-    created: function() {
-        window.onbeforeunload = () => {
-            let dataStr = JSON.stringify(this.todoList) //取出todoList 并JSON字符串化
-            window.localStorage.setItem("myTodos", dataStr) //存进localStorage
-        }
-        let oldDataString = window.localStorage.getItem('myTodos') //从localStorage中取出
-        let oldData = JSON.parse(oldDataString) //JSON化
-        this.todoList = oldData || [] //覆盖 todoList
-            this.currentUser = this.getCurrentUser()
     }
 })

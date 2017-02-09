@@ -56,98 +56,153 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var APP_ID = 'S4Jth8Wn51NoWMoxVEyjpsg5-gzGzoHsz';
-	var APP_KEY = 'sQhBBOPOSIq0JEya9YkiaYHF';
+	var APP_ID = '8axnRtGoxCJhEzsvNPEAHnol-gzGzoHsz';
+	var APP_KEY = '0YH4XkYflb4CUPfA743TGj8G';
 	_leancloudStorage2.default.init({
 	    appId: APP_ID,
 	    appKey: APP_KEY
 	});
 
-	var TestObject = _leancloudStorage2.default.Object.extend('TestObject');
-	var testObject = new TestObject();
-
 	var app = new _vue2.default({
 	    el: '#app',
 	    data: {
-	        newTodo: '', //和输入框绑定
-	        todoList: [], //存储todo项目
-	        formData: { //用户数据
+	        actionType: 'signUp',
+	        formData: {
 	            username: '',
 	            password: ''
 	        },
-	        actionType: 'signUp', //这个值决定 是显示 注册  还是 显示 登录
-	        currentUser: null //未登录时是空的,登陆后 getCurrentUser() 会给其赋值
+	        newTodo: '',
+	        todoList: [],
+	        currentUser: null
 	    },
+	    created: function created() {
+
+	        this.currentUser = this.getCurrentUser();
+	        this.fetchTodos(); // 将原来的一坨代码取一个名字叫做 fetchTodos
+	    },
+	    // watch: function() {
+	    //     if (this.currentUser == null) {
+	    //         this.actionType = 'signUp'
+	    //     }
+	    // },
 	    methods: {
+	        fetchTodos: function fetchTodos() {
+	            var _this = this;
+
+	            if (this.currentUser) {
+	                var query = new _leancloudStorage2.default.Query('AllTodos');
+	                query.find().then(function (todos) {
+	                    var avAllTodos = todos[0]; // 因为理论上 AllTodos 只有一个，所以我们取结果的第一项
+	                    var id = avAllTodos.id;
+	                    _this.todoList = JSON.parse(avAllTodos.attributes.content); // 为什么有个 attributes？因为我从控制台看到的
+	                    _this.todoList.id = id; // 为什么给 todoList 这个数组设置 id？因为数组也是对象啊
+	                }, function (error) {
+	                    console.error(error);
+	                });
+	            }
+	        },
+	        updateTodos: function updateTodos() {
+	            // 想要知道如何更新对象，先看文档 https://leancloud.cn/docs/leanstorage_guide-js.html#更新对象
+	            var dataString = JSON.stringify(this.todoList); // JSON 在序列化这个有 id 的数组的时候，会得出怎样的结果？
+	            var avTodos = _leancloudStorage2.default.Object.createWithoutData('AllTodos', this.todoList.id);
+	            avTodos.set('content', dataString);
+	            avTodos.save().then(function () {
+	                console.log('更新成功');
+	            });
+	        },
+	        saveTodos: function saveTodos() {
+	            var _this2 = this;
+
+	            var dataString = JSON.stringify(this.todoList);
+	            var AVTodos = _leancloudStorage2.default.Object.extend('AllTodos');
+	            var avTodos = new AVTodos();
+	            var acl = new _leancloudStorage2.default.ACL();
+	            acl.setReadAccess(_leancloudStorage2.default.User.current(), true); // 只有这个 user 能读
+	            acl.setWriteAccess(_leancloudStorage2.default.User.current(), true); // 只有这个 user 能写
+
+	            avTodos.set('content', dataString);
+	            avTodos.setACL(acl); // 设置访问控制
+	            avTodos.save().then(function (todo) {
+	                _this2.todoList.id = todo.id; // 一定要记得把 id 挂到 this.todoList 上，否则下次就不会调用 updateTodos 了
+	                console.log('保存成功');
+	            }, function (error) {
+	                alert('保存失败');
+	            });
+	        },
+	        saveOrUpdateTodos: function saveOrUpdateTodos() {
+	            if (this.todoList.id) {
+	                this.updateTodos();
+	            } else {
+	                this.saveTodos();
+	            }
+	        },
 	        addTodo: function addTodo() {
-	            console.log('addddd');
+	            console.log('添加成功');
 	            var time = new Date();
 	            this.todoList.push({
-	                title: this.newTodo, //输入的内容
+	                title: this.newTodo,
+	                createdAt: new Date(),
 	                todoTime: time.getFullYear() + '年' + (time.getMonth() + 1) + '月' + time.getDate() + '日 ' + time.getHours() + ':' + time.getMinutes(), //建立时间
-	                done: false // 是否完成
+	                done: false // 添加一个 done 属性
 	            });
 	            this.newTodo = '';
+	            this.saveOrUpdateTodos(); // 不能用 saveTodos 了
 	        },
 	        removeTodo: function removeTodo(todo) {
-	            var index = this.todoList.indexOf(todo); //查看排第几
-	            this.todoList.splice(index, 1); // 在 index的位置删去一个元素
+	            console.log(todo);
+	            var index = this.todoList.indexOf(todo);
+	            console.log(index);
+	            this.todoList.splice(index, 1); // 不懂 splice？赶紧看 MDN 文档！
+	            this.saveOrUpdateTodos(); // 不能用 saveTodos 了
+	        },
+	        doneTodo: function doneTodo(todo) {
+
+	            //!!!!点击多选框这个行为本身就已经修改了一次 done的状态了!!!
+	            this.saveOrUpdateTodos();
 	        },
 	        signUp: function signUp() {
-	            var _this = this;
+	            var _this3 = this;
 
 	            var user = new _leancloudStorage2.default.User();
 	            user.setUsername(this.formData.username);
 	            user.setPassword(this.formData.password);
 	            user.signUp().then(function (loginedUser) {
-	                _this.currentUser = _this.getCurrentUser();
+	                _this3.currentUser = _this3.getCurrentUser();
 	            }, function (error) {
-	                alert('注册失败.用户名可能非法,或者已被注册.');
+	                alert('注册失败');
+	                console.log(error);
 	            });
 	        },
 	        login: function login() {
-	            var _this2 = this;
+	            var _this4 = this;
 
 	            _leancloudStorage2.default.User.logIn(this.formData.username, this.formData.password).then(function (loginedUser) {
-	                _this2.currentUser = _this2.getCurrentUser();
+	                _this4.currentUser = _this4.getCurrentUser();
+	                _this4.fetchTodos(); // 登录成功后读取 todos
 	            }, function (error) {
-	                alert('登录失败,用户名和密码可能错误');
+	                alert('登录失败');
+	                console.log(error);
 	            });
-	        },
-	        logOut: function logOut() {
-	            _leancloudStorage2.default.User.logOut();
-	            this.currentUser = null; //退出登录了就得把 currentUser 改一下
-	            window.location.reload();
 	        },
 	        getCurrentUser: function getCurrentUser() {
 	            var current = _leancloudStorage2.default.User.current();
-	            //ES6 解构赋值
 	            if (current) {
 	                var id = current.id,
 	                    createdAt = current.createdAt,
 	                    username = current.attributes.username;
+	                // 上面这句话看不懂就得看 MDN 文档了
+	                // 我的《ES 6 新特性列表》里面有链接：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
 
-	                return {
-	                    id: id,
-	                    username: username,
-	                    createdAt: createdAt
-	                };
+	                return { id: id, username: username, createdAt: createdAt }; // 看文档：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Object_initializer#ECMAScript_6%E6%96%B0%E6%A0%87%E8%AE%B0
 	            } else {
 	                return null;
 	            }
+	        },
+	        logout: function logout() {
+	            _leancloudStorage2.default.User.logOut();
+	            this.currentUser = null;
+	            window.location.reload();
 	        }
-	    },
-	    created: function created() {
-	        var _this3 = this;
-
-	        window.onbeforeunload = function () {
-	            var dataStr = JSON.stringify(_this3.todoList); //取出todoList 并JSON字符串化
-	            window.localStorage.setItem("myTodos", dataStr); //存进localStorage
-	        };
-	        var oldDataString = window.localStorage.getItem('myTodos'); //从localStorage中取出
-	        var oldData = JSON.parse(oldDataString); //JSON化
-	        this.todoList = oldData || []; //覆盖 todoList
-	        this.currentUser = this.getCurrentUser();
 	    }
 	});
 
