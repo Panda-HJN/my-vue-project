@@ -22,63 +22,11 @@ var app = new Vue({
     },
     created: function() {
 
-        this.currentUser = this.getCurrentUser();
-        this.fetchTodos() // 将原来的一坨代码取一个名字叫做 fetchTodos
+        this.currentUser = this.getCurrentUser() //查看当前用户是谁,或者是不是null
+        this.fetchTodos() //vue 实例 建立完成后 获取 数据
 
     },
-    // watch: function() {
-    //     if (this.currentUser == null) {
-    //         this.actionType = 'signUp'
-    //     }
-    // },
     methods: {
-        fetchTodos: function() {
-            if (this.currentUser) {
-                var query = new AV.Query('AllTodos');
-                query.find()
-                    .then((todos) => {
-                        let avAllTodos = todos[0] // 因为理论上 AllTodos 只有一个，所以我们取结果的第一项
-                        let id = avAllTodos.id
-                        this.todoList = JSON.parse(avAllTodos.attributes.content) // 为什么有个 attributes？因为我从控制台看到的
-                        this.todoList.id = id // 为什么给 todoList 这个数组设置 id？因为数组也是对象啊
-                    }, function(error) {
-                        console.error(error)
-                    })
-            }
-        },
-        updateTodos: function() {
-            // 想要知道如何更新对象，先看文档 https://leancloud.cn/docs/leanstorage_guide-js.html#更新对象
-            let dataString = JSON.stringify(this.todoList) // JSON 在序列化这个有 id 的数组的时候，会得出怎样的结果？
-            let avTodos = AV.Object.createWithoutData('AllTodos', this.todoList.id)
-            avTodos.set('content', dataString)
-            avTodos.save().then(() => {
-                console.log('更新成功')
-            })
-        },
-        saveTodos: function() {
-            let dataString = JSON.stringify(this.todoList)
-            var AVTodos = AV.Object.extend('AllTodos');
-            var avTodos = new AVTodos();
-            var acl = new AV.ACL()
-            acl.setReadAccess(AV.User.current(), true) // 只有这个 user 能读
-            acl.setWriteAccess(AV.User.current(), true) // 只有这个 user 能写
-
-            avTodos.set('content', dataString);
-            avTodos.setACL(acl) // 设置访问控制
-            avTodos.save().then((todo) => {
-                this.todoList.id = todo.id // 一定要记得把 id 挂到 this.todoList 上，否则下次就不会调用 updateTodos 了
-                console.log('保存成功');
-            }, function(error) {
-                alert('保存失败');
-            });
-        },
-        saveOrUpdateTodos: function() {
-            if (this.todoList.id) {
-                this.updateTodos()
-            } else {
-                this.saveTodos()
-            }
-        },
         addTodo: function() {
             console.log('添加成功')
             var time = new Date()
@@ -86,21 +34,22 @@ var app = new Vue({
                 title: this.newTodo,
                 createdAt: new Date(),
                 todoTime: time.getFullYear() + '年' + (time.getMonth() + 1) + '月' + time.getDate() + '日 ' + time.getHours() + ':' + time.getMinutes(), //建立时间
-                done: false // 添加一个 done 属性
+                done: false // done 表示 已完成还是未完成
             })
             this.newTodo = ''
-            this.saveOrUpdateTodos() // 不能用 saveTodos 了
+            this.saveOrUpdateTodos() //每次修改后 都这行这个
         },
         removeTodo: function(todo) {
             console.log(todo)
             let index = this.todoList.indexOf(todo)
             console.log(index)
-            this.todoList.splice(index, 1) // 不懂 splice？赶紧看 MDN 文档！
-            this.saveOrUpdateTodos() // 不能用 saveTodos 了
+            this.todoList.splice(index, 1)
+            this.saveOrUpdateTodos()
         },
         doneTodo: function(todo) {
 
             //!!!!点击多选框这个行为本身就已经修改了一次 done的状态了!!!
+            //所以这里只需要保存并更新就好了
             this.saveOrUpdateTodos()
         },
         signUp: function() {
@@ -138,6 +87,52 @@ var app = new Vue({
             AV.User.logOut()
             this.currentUser = null
             window.location.reload()
+        },
+        fetchTodos: function() {
+            if (this.currentUser) {
+                var query = new AV.Query('AllTodos');
+                query.find()
+                    .then((todos) => {
+                        let avAllTodos = todos[0]
+                        let id = avAllTodos.id
+                        this.todoList = JSON.parse(avAllTodos.attributes.content)
+                        this.todoList.id = id // 每个todolist 都是有ID的
+                    }, function(error) {
+                        console.error(error)
+                    })
+            }
+        },
+        updateTodos: function() {
+            let dataString = JSON.stringify(this.todoList)
+            let avTodos = AV.Object.createWithoutData('AllTodos', this.todoList.id)
+            avTodos.set('content', dataString)
+            avTodos.save().then(() => {
+                console.log('更新成功')
+            })
+        },
+        saveTodos: function() {
+            let dataString = JSON.stringify(this.todoList)
+            var AVTodos = AV.Object.extend('AllTodos')
+            var avTodos = new AVTodos();
+            var acl = new AV.ACL()
+            acl.setReadAccess(AV.User.current(), true) // 指定 user 
+            acl.setWriteAccess(AV.User.current(), true) //
+
+            avTodos.set('content', dataString);
+            avTodos.setACL(acl)
+            avTodos.save().then((todo) => {
+                this.todoList.id = todo.id // id必须 挂到 this.todoList 上!!!!!
+                console.log('保存成功');
+            }, function(error) {
+                alert('保存失败');
+            });
+        },
+        saveOrUpdateTodos: function() {
+            if (this.todoList.id) {
+                this.updateTodos()
+            } else {
+                this.saveTodos()
+            }
         }
     }
 })
