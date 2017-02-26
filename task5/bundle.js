@@ -76,7 +76,7 @@
 	        currentUser: null
 	    },
 	    created: function created() {
-
+	        console.log(app);
 	        this.currentUser = this.getCurrentUser(); //查看当前用户是谁,或者是不是null
 	        this.fetchTodos(); //vue 实例 建立完成后 获取 数据
 	    },
@@ -139,7 +139,11 @@
 	                // 上面这句话看不懂就得看 MDN 文档了
 	                // 我的《ES 6 新特性列表》里面有链接：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
 
-	                return { id: id, username: username, createdAt: createdAt }; // 看文档：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Object_initializer#ECMAScript_6%E6%96%B0%E6%A0%87%E8%AE%B0
+	                return {
+	                    id: id,
+	                    username: username,
+	                    createdAt: createdAt
+	                }; // 看文档：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Object_initializer#ECMAScript_6%E6%96%B0%E6%A0%87%E8%AE%B0
 	            } else {
 	                return null;
 	            }
@@ -179,7 +183,7 @@
 	            var AVTodos = _leancloudStorage2.default.Object.extend('AllTodos');
 	            var avTodos = new AVTodos();
 	            var acl = new _leancloudStorage2.default.ACL();
-	            acl.setReadAccess(_leancloudStorage2.default.User.current(), true); // 指定 user 
+	            acl.setReadAccess(_leancloudStorage2.default.User.current(), true); // 指定 user
 	            acl.setWriteAccess(_leancloudStorage2.default.User.current(), true); //
 
 	            avTodos.set('content', dataString);
@@ -199,6 +203,11 @@
 	            }
 	        }
 	    }
+	});
+
+	$(".formBox").hover3d({
+	    selector: ".hover-3d",
+	    sensitivity: 20
 	});
 
 /***/ },

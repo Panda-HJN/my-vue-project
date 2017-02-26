@@ -1,0 +1,295 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+}
+
+ul,
+ol {
+    padding: 0;
+}
+
+div#app {
+    display: flex;
+    position: relative;
+    width: 100vw;
+    min-width: 400px;
+    height: 100vh;
+    min-height: 520px;
+    background: #3CA55C;
+    background: linear-gradient(to left, #3CA55C, #B5AC49);
+    align-items: center;
+    justify-content: center;
+}
+
+div#app .box {
+    position: relative;
+    overflow: hidden;
+    width: 65vw;
+    min-width: 350px;
+    height: 85vh;
+    min-height: 400px;
+    background: white;
+    border-radius: 16px;
+    align-items: stretch;
+}
+
+.boxBackground {
+    display: flex;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 4;
+    
+}
+
+.leftBox {
+    position: relative;
+    overflow: hidden;
+    width: 50%;
+    height: 100%;
+    background: orangered;
+    border-bottom-left-radius: 16px;
+    border-top-left-radius: 16px;
+}
+
+.leftBox>div {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 250px;
+    height: 250px;
+    margin-left: -125px;
+    border: 30px solid white;
+    border-radius: 100%;
+    background: white;
+}
+
+.leftBox>div::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 100%;
+    background: orangered;
+}
+
+.rightBox {
+    position: relative;
+    overflow: hidden;
+    width: 50%;
+    height: 100%;
+    background: white;
+    border-bottom-right-radius: 16px;
+    border-top-right-radius: 16px;
+}
+
+.rightBox>div {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    width: 250px;
+    height: 250px;
+    margin-right: -125px;
+    border: 30px solid orangered;
+    border-radius: 100%;
+    background: white;
+}
+
+.singToggle {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.formBox {
+    position: relative;
+    overflow: hidden;
+    width: 350px;
+    height: 400px;
+    padding: 25px;
+    top: 50%;
+    left: 50%;
+    margin-top: -200px;
+    margin-left: -175px;
+    background: #ccc;
+    z-index: 5;
+    border-radius: 16px;
+    perspective: 1000px;
+}
+
+.hover-3d {
+    position: relative;
+    width: 100%;
+    height: 350px;
+}
+
+.hover-3d-import {
+    width: 100%;
+    height: 350px;
+}
+
+.formBox .layer-1 {
+    display: flex;
+    flex-direction: column-reverse;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 6;
+    transform: translateZ(25px);
+}
+
+.formBox .layer-2 {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 7;
+    transform: translateZ(40px);
+}
+
+.layer-3 {
+    transform: translateZ(50px);
+}
+
+.form {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    /*background: wheat;*/
+    z-index: 8;
+}
+
+.formRow {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    align-self: center;
+    width: 100%;
+    height: 80px;
+    padding: 20px 0;
+    font-size: 15px;
+    text-align: right;
+}
+
+.formRow {
+    color: white;
+    font-weight: bolder
+}
+
+.formRow input {
+    width: 75%;
+    height: 32px;
+    line-height: 32px;
+}
+
+.formActions {
+    display: flex;
+    justify-content: center;
+    align-self: stretch;
+    margin: 0 auto;
+}
+.circle1{
+    width: 90px;
+    height: 90px;
+    margin-bottom: 60px;
+    margin-left: 41%;
+    border-radius: 100%;
+    background-color: orangered;
+}
+
+.circle2{
+    width: 130px;
+    height: 130px;
+    margin-top: 140px;
+    margin-right: 80px;
+    border-radius: 100%;
+    background-color: white;
+}
+
+/*登陆后的样式*/
+
+.red {
+    color: red;
+}
+
+.blue {
+    color: blue;
+}
+
+
+
+
+.topBar {
+    background: #009999;
+    width: 100%;
+    height: 60px;
+    line-height: 60px;
+    font-size: 32px;
+    padding: 0 100px;
+    position: fixed;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 3px 0 rgba(1, 0, 0, 0.25);
+}
+
+
+/*每日复习:使用了absolute的元素 宽度和高度都会塌陷!*/
+
+.user {
+    margin-right: 40px;
+}
+
+#todo {
+    width: 100%;
+    height: 100%;
+    padding-top: 60px;
+}
+
+.newTask input {
+    display: flex;
+    height: 40px;
+    line-height: 40px;
+    font-size: 40px;
+    margin: 0 auto;
+    margin-top: 50px;
+}
+
+ol.todos {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px 100px;
+}
+
+ol.todos>li {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background: #3399FF;
+    height: 40px;
+    line-height: 40px;
+    font-size: 24px;
+    padding: 10px 0;
+    margin: 10px;
+}
+
+#todo li input {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin: 0 10px;
+}

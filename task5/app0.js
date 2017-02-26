@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import AV from 'leancloud-storage'
 
+
 let APP_ID = '8axnRtGoxCJhEzsvNPEAHnol-gzGzoHsz';
 let APP_KEY = '0YH4XkYflb4CUPfA743TGj8G';
 AV.init({
@@ -20,14 +21,14 @@ var app = new Vue({
         todoList: [],
         currentUser: null,
     },
-    created: function() {
-
+    created: function () {
+        console.log(app)
         this.currentUser = this.getCurrentUser() //查看当前用户是谁,或者是不是null
         this.fetchTodos() //vue 实例 建立完成后 获取 数据
 
     },
     methods: {
-        addTodo: function() {
+        addTodo: function () {
             console.log('添加成功')
             var time = new Date()
             this.todoList.push({
@@ -39,20 +40,20 @@ var app = new Vue({
             this.newTodo = ''
             this.saveOrUpdateTodos() //每次修改后 都这行这个
         },
-        removeTodo: function(todo) {
+        removeTodo: function (todo) {
             console.log(todo)
             let index = this.todoList.indexOf(todo)
             console.log(index)
             this.todoList.splice(index, 1)
             this.saveOrUpdateTodos()
         },
-        doneTodo: function(todo) {
+        doneTodo: function (todo) {
 
             //!!!!点击多选框这个行为本身就已经修改了一次 done的状态了!!!
             //所以这里只需要保存并更新就好了
             this.saveOrUpdateTodos()
         },
-        signUp: function() {
+        signUp: function () {
             let user = new AV.User();
             user.setUsername(this.formData.username);
             user.setPassword(this.formData.password);
@@ -63,32 +64,42 @@ var app = new Vue({
                 console.log(error)
             });
         },
-        login: function() {
+        login: function () {
             AV.User.logIn(this.formData.username, this.formData.password).then((loginedUser) => {
                 this.currentUser = this.getCurrentUser()
                 this.fetchTodos() // 登录成功后读取 todos
-            }, function(error) {
+            }, function (error) {
                 alert('登录失败')
                 console.log(error)
             });
         },
-        getCurrentUser: function() {
+        getCurrentUser: function () {
             let current = AV.User.current()
             if (current) {
-                let { id, createdAt, attributes: { username } } = current
+                let {
+                    id,
+                    createdAt,
+                    attributes: {
+                        username
+                    }
+                } = current
                 // 上面这句话看不懂就得看 MDN 文档了
                 // 我的《ES 6 新特性列表》里面有链接：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
-                return { id, username, createdAt } // 看文档：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Object_initializer#ECMAScript_6%E6%96%B0%E6%A0%87%E8%AE%B0
+                return {
+                    id,
+                    username,
+                    createdAt
+                } // 看文档：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Object_initializer#ECMAScript_6%E6%96%B0%E6%A0%87%E8%AE%B0
             } else {
                 return null
             }
         },
-        logout: function() {
+        logout: function () {
             AV.User.logOut()
             this.currentUser = null
             window.location.reload()
         },
-        fetchTodos: function() {
+        fetchTodos: function () {
             if (this.currentUser) {
                 var query = new AV.Query('AllTodos');
                 query.find()
@@ -97,12 +108,12 @@ var app = new Vue({
                         let id = avAllTodos.id
                         this.todoList = JSON.parse(avAllTodos.attributes.content)
                         this.todoList.id = id // 每个todolist 都是有ID的
-                    }, function(error) {
+                    }, function (error) {
                         console.error(error)
                     })
             }
         },
-        updateTodos: function() {
+        updateTodos: function () {
             let dataString = JSON.stringify(this.todoList)
             let avTodos = AV.Object.createWithoutData('AllTodos', this.todoList.id)
             avTodos.set('content', dataString)
@@ -110,7 +121,7 @@ var app = new Vue({
                 console.log('更新成功')
             })
         },
-        saveTodos: function() {
+        saveTodos: function () {
             let dataString = JSON.stringify(this.todoList)
             var AVTodos = AV.Object.extend('AllTodos')
             var avTodos = new AVTodos();
@@ -123,11 +134,11 @@ var app = new Vue({
             avTodos.save().then((todo) => {
                 this.todoList.id = todo.id // id必须 挂到 this.todoList 上!!!!!
                 console.log('保存成功');
-            }, function(error) {
+            }, function (error) {
                 alert('保存失败');
             });
         },
-        saveOrUpdateTodos: function() {
+        saveOrUpdateTodos: function () {
             if (this.todoList.id) {
                 this.updateTodos()
             } else {
@@ -136,3 +147,8 @@ var app = new Vue({
         }
     }
 })
+
+$(".formBox").hover3d({
+    selector: ".hover-3d",
+    sensitivity: 20
+});
